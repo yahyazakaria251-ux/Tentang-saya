@@ -2,17 +2,17 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Profil Yahya Zakaria</title>
+  <title>Profil Editable - Yahya Zakaria</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      background: linear-gradient(135deg, #667eea, #764ba2);
       margin: 0;
       padding: 0;
     }
 
     .container {
-      max-width: 650px;
+      max-width: 700px;
       margin: 40px auto;
       background: #fff;
       border-radius: 15px;
@@ -24,59 +24,63 @@
       text-align: center;
     }
 
-    /* FOTO PROFIL */
-    .foto-box {
+    /* FOTO */
+    .foto {
       text-align: center;
       margin-bottom: 20px;
     }
 
-    .foto-box img {
-      width: 140px;
-      height: 140px;
-      object-fit: cover;
+    .foto img {
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
-      border: 4px solid #4facfe;
+      object-fit: cover;
+      border: 4px solid #667eea;
       display: none;
     }
 
-    input[type="file"] {
-      margin-top: 10px;
-    }
-
     /* PROFIL */
-    .profil p {
-      font-size: 16px;
-      color: #333;
-      margin: 6px 0;
+    .profil label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
     }
 
-    /* PESAN */
-    textarea {
+    .profil input {
       width: 100%;
-      height: 80px;
-      padding: 10px;
+      padding: 8px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      resize: none;
-      margin-top: 10px;
+      margin-top: 5px;
     }
 
     button {
-      padding: 8px 15px;
+      margin-top: 12px;
+      padding: 8px 16px;
       border: none;
       border-radius: 8px;
-      background: #4facfe;
+      background: #667eea;
       color: white;
       cursor: pointer;
-      margin-top: 10px;
     }
 
     button:hover {
       opacity: 0.9;
     }
 
+    /* PESAN */
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+
     .pesan {
-      background: #f4f6f8;
+      background: #f3f4f6;
       padding: 10px;
       border-radius: 8px;
       margin-top: 10px;
@@ -92,7 +96,7 @@
     }
 
     hr {
-      margin: 20px 0;
+      margin: 25px 0;
     }
   </style>
 </head>
@@ -103,7 +107,7 @@
   <h1>Profil Saya</h1>
 
   <!-- FOTO PROFIL -->
-  <div class="foto-box">
+  <div class="foto">
     <img id="fotoProfil">
     <br>
     <input type="file" id="uploadFoto" accept="image/*">
@@ -111,12 +115,22 @@
     <button onclick="hapusFoto()">Hapus Foto</button>
   </div>
 
-  <!-- PROFIL -->
+  <!-- PROFIL EDIT -->
+  <h2>Data Diri</h2>
   <div class="profil">
-    <p><strong>Nama:</strong> Yahya Zakaria</p>
-    <p><strong>Sekolah:</strong> SMP Negeri 1 Sukoharjo</p>
-    <p><strong>Kelas:</strong> IXA</p>
-    <p><strong>Minat:</strong> Teknologi & Pemrograman</p>
+    <label>Nama</label>
+    <input type="text" id="nama">
+
+    <label>Sekolah</label>
+    <input type="text" id="sekolah">
+
+    <label>Kelas</label>
+    <input type="text" id="kelas">
+
+    <label>Minat</label>
+    <input type="text" id="minat">
+
+    <button onclick="simpanProfil()">Simpan Profil</button>
   </div>
 
   <hr>
@@ -131,101 +145,124 @@
 </div>
 
 <script>
-  /* ===== FOTO PROFIL ===== */
-  const uploadFoto = document.getElementById("uploadFoto");
-  const fotoProfil = document.getElementById("fotoProfil");
+/* ===== PROFIL ===== */
+const profilDefault = {
+  nama: "Yahya Zakaria",
+  sekolah: "SMP Negeri 1 Sukoharjo",
+  kelas: "IXA",
+  minat: "Teknologi & Pemrograman"
+};
 
-  const fotoTersimpan = localStorage.getItem("fotoProfilYahya");
-  if (fotoTersimpan) {
-    fotoProfil.src = fotoTersimpan;
+function loadProfil() {
+  const data = JSON.parse(localStorage.getItem("profilYahya")) || profilDefault;
+  document.getElementById("nama").value = data.nama;
+  document.getElementById("sekolah").value = data.sekolah;
+  document.getElementById("kelas").value = data.kelas;
+  document.getElementById("minat").value = data.minat;
+}
+
+function simpanProfil() {
+  const data = {
+    nama: nama.value,
+    sekolah: sekolah.value,
+    kelas: kelas.value,
+    minat: minat.value
+  };
+  localStorage.setItem("profilYahya", JSON.stringify(data));
+  alert("Profil berhasil disimpan!");
+}
+
+loadProfil();
+
+/* ===== FOTO ===== */
+const fotoProfil = document.getElementById("fotoProfil");
+const uploadFoto = document.getElementById("uploadFoto");
+
+const fotoSimpan = localStorage.getItem("fotoProfilYahya");
+if (fotoSimpan) {
+  fotoProfil.src = fotoSimpan;
+  fotoProfil.style.display = "inline-block";
+}
+
+uploadFoto.addEventListener("change", function () {
+  const file = uploadFoto.files[0];
+  if (!file) return;
+
+  if (file.size > 1024 * 1024) {
+    alert("Ukuran foto maksimal 1MB");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    localStorage.setItem("fotoProfilYahya", e.target.result);
+    fotoProfil.src = e.target.result;
     fotoProfil.style.display = "inline-block";
-  }
+  };
+  reader.readAsDataURL(file);
+});
 
-  uploadFoto.addEventListener("change", function () {
-    const file = uploadFoto.files[0];
-    if (!file) return;
+function hapusFoto() {
+  localStorage.removeItem("fotoProfilYahya");
+  fotoProfil.style.display = "none";
+}
 
-    if (file.size > 1024 * 1024) {
-      alert("Ukuran maksimal foto 1MB!");
-      return;
-    }
+/* ===== PESAN ===== */
+let editIndex = null;
 
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      localStorage.setItem("fotoProfilYahya", e.target.result);
-      fotoProfil.src = e.target.result;
-      fotoProfil.style.display = "inline-block";
-    };
-    reader.readAsDataURL(file);
-  });
+function ambilPesan() {
+  return JSON.parse(localStorage.getItem("pesanYahya")) || [];
+}
 
-  function hapusFoto() {
-    localStorage.removeItem("fotoProfilYahya");
-    fotoProfil.style.display = "none";
-  }
+function simpanDataPesan(data) {
+  localStorage.setItem("pesanYahya", JSON.stringify(data));
+}
 
-  /* ===== PESAN ===== */
-  let editIndex = null;
-
-  function ambilData() {
-    return JSON.parse(localStorage.getItem("pesanYahya")) || [];
-  }
-
-  function simpanData(data) {
-    localStorage.setItem("pesanYahya", JSON.stringify(data));
-  }
-
-  function tampilPesan() {
-    const list = document.getElementById("listPesan");
-    list.innerHTML = "";
-    const data = ambilData();
-
-    data.forEach((pesan, index) => {
-      list.innerHTML += `
-        <div class="pesan">
-          <p>${pesan}</p>
-          <div class="aksi">
-            <button onclick="editPesan(${index})">Edit</button>
-            <button class="hapus" onclick="hapusPesan(${index})">Hapus</button>
-          </div>
+function tampilPesan() {
+  const list = document.getElementById("listPesan");
+  list.innerHTML = "";
+  ambilPesan().forEach((p, i) => {
+    list.innerHTML += `
+      <div class="pesan">
+        <p>${p}</p>
+        <div class="aksi">
+          <button onclick="editPesan(${i})">Edit</button>
+          <button class="hapus" onclick="hapusPesan(${i})">Hapus</button>
         </div>
-      `;
-    });
+      </div>`;
+  });
+}
+
+function simpanPesan() {
+  const teks = inputPesan.value.trim();
+  if (!teks) return alert("Pesan kosong!");
+
+  const data = ambilPesan();
+  if (editIndex !== null) {
+    data[editIndex] = teks;
+    editIndex = null;
+  } else {
+    data.push(teks);
   }
 
-  function simpanPesan() {
-    const input = document.getElementById("inputPesan");
-    const teks = input.value.trim();
-    if (teks === "") return alert("Pesan kosong!");
-
-    const data = ambilData();
-
-    if (editIndex !== null) {
-      data[editIndex] = teks;
-      editIndex = null;
-    } else {
-      data.push(teks);
-    }
-
-    simpanData(data);
-    input.value = "";
-    tampilPesan();
-  }
-
-  function editPesan(index) {
-    const data = ambilData();
-    document.getElementById("inputPesan").value = data[index];
-    editIndex = index;
-  }
-
-  function hapusPesan(index) {
-    const data = ambilData();
-    data.splice(index, 1);
-    simpanData(data);
-    tampilPesan();
-  }
-
+  simpanDataPesan(data);
+  inputPesan.value = "";
   tampilPesan();
+}
+
+function editPesan(i) {
+  inputPesan.value = ambilPesan()[i];
+  editIndex = i;
+}
+
+function hapusPesan(i) {
+  const data = ambilPesan();
+  data.splice(i, 1);
+  simpanDataPesan(data);
+  tampilPesan();
+}
+
+tampilPesan();
 </script>
 
 </body>

@@ -6,144 +6,227 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
       margin: 0;
       padding: 0;
     }
+
     .container {
-      max-width: 600px;
-      margin: 50px auto;
-      background: white;
+      max-width: 650px;
+      margin: 40px auto;
+      background: #fff;
       border-radius: 15px;
       padding: 25px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
     }
+
     h1, h2 {
       text-align: center;
     }
-    .profile p {
+
+    /* FOTO PROFIL */
+    .foto-box {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .foto-box img {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #4facfe;
+      display: none;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+    }
+
+    /* PROFIL */
+    .profil p {
       font-size: 16px;
       color: #333;
+      margin: 6px 0;
     }
+
+    /* PESAN */
     textarea {
       width: 100%;
-      height: 70px;
+      height: 80px;
       padding: 10px;
-      margin-top: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
       resize: none;
-    }
-    button {
       margin-top: 10px;
+    }
+
+    button {
       padding: 8px 15px;
       border: none;
       border-radius: 8px;
-      background: #667eea;
+      background: #4facfe;
       color: white;
       cursor: pointer;
-    }
-    button:hover {
-      background: #5563c1;
-    }
-    .message {
-      background: #f3f3f3;
-      padding: 10px;
       margin-top: 10px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .pesan {
+      background: #f4f6f8;
+      padding: 10px;
       border-radius: 8px;
+      margin-top: 10px;
     }
-    .actions button {
-      margin-right: 5px;
+
+    .aksi button {
       background: #ff9800;
+      margin-right: 5px;
     }
-    .actions .delete {
+
+    .aksi .hapus {
       background: #e53935;
+    }
+
+    hr {
+      margin: 20px 0;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Tentang Saya</h1>
-    <div class="profile">
-      <p><strong>Nama:</strong> Yahya Zakaria</p>
-      <p><strong>Sekolah:</strong> SMP Negeri 1 Sukoharjo</p>
-      <p><strong>Kelas:</strong> IXA</p>
-      <p><strong>Minat:</strong> Teknologi & Pemrograman</p>
-    </div>
+<div class="container">
 
-    <hr>
+  <h1>Profil Saya</h1>
 
-    <h2>Pesan / Catatan</h2>
-    <textarea id="pesan" placeholder="Tulis pesan di sini..."></textarea>
-    <button onclick="tambahPesan()">Simpan Pesan</button>
-
-    <div id="daftarPesan"></div>
+  <!-- FOTO PROFIL -->
+  <div class="foto-box">
+    <img id="fotoProfil">
+    <br>
+    <input type="file" id="uploadFoto" accept="image/*">
+    <br>
+    <button onclick="hapusFoto()">Hapus Foto</button>
   </div>
 
-  <script>
-    let editIndex = null;
+  <!-- PROFIL -->
+  <div class="profil">
+    <p><strong>Nama:</strong> Yahya Zakaria</p>
+    <p><strong>Sekolah:</strong> SMP Negeri 1 Sukoharjo</p>
+    <p><strong>Kelas:</strong> IXA</p>
+    <p><strong>Minat:</strong> Teknologi & Pemrograman</p>
+  </div>
 
-    function ambilPesan() {
-      return JSON.parse(localStorage.getItem("pesanYahya")) || [];
+  <hr>
+
+  <!-- PESAN -->
+  <h2>Pesan / Catatan</h2>
+  <textarea id="inputPesan" placeholder="Tulis pesan di sini..."></textarea>
+  <button onclick="simpanPesan()">Simpan Pesan</button>
+
+  <div id="listPesan"></div>
+
+</div>
+
+<script>
+  /* ===== FOTO PROFIL ===== */
+  const uploadFoto = document.getElementById("uploadFoto");
+  const fotoProfil = document.getElementById("fotoProfil");
+
+  const fotoTersimpan = localStorage.getItem("fotoProfilYahya");
+  if (fotoTersimpan) {
+    fotoProfil.src = fotoTersimpan;
+    fotoProfil.style.display = "inline-block";
+  }
+
+  uploadFoto.addEventListener("change", function () {
+    const file = uploadFoto.files[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      alert("Ukuran maksimal foto 1MB!");
+      return;
     }
 
-    function simpanPesan(data) {
-      localStorage.setItem("pesanYahya", JSON.stringify(data));
-    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      localStorage.setItem("fotoProfilYahya", e.target.result);
+      fotoProfil.src = e.target.result;
+      fotoProfil.style.display = "inline-block";
+    };
+    reader.readAsDataURL(file);
+  });
 
-    function tampilPesan() {
-      const daftar = document.getElementById("daftarPesan");
-      daftar.innerHTML = "";
-      const data = ambilPesan();
+  function hapusFoto() {
+    localStorage.removeItem("fotoProfilYahya");
+    fotoProfil.style.display = "none";
+  }
 
-      data.forEach((item, index) => {
-        daftar.innerHTML += `
-          <div class="message">
-            <p>${item}</p>
-            <div class="actions">
-              <button onclick="editPesan(${index})">Edit</button>
-              <button class="delete" onclick="hapusPesan(${index})">Hapus</button>
-            </div>
+  /* ===== PESAN ===== */
+  let editIndex = null;
+
+  function ambilData() {
+    return JSON.parse(localStorage.getItem("pesanYahya")) || [];
+  }
+
+  function simpanData(data) {
+    localStorage.setItem("pesanYahya", JSON.stringify(data));
+  }
+
+  function tampilPesan() {
+    const list = document.getElementById("listPesan");
+    list.innerHTML = "";
+    const data = ambilData();
+
+    data.forEach((pesan, index) => {
+      list.innerHTML += `
+        <div class="pesan">
+          <p>${pesan}</p>
+          <div class="aksi">
+            <button onclick="editPesan(${index})">Edit</button>
+            <button class="hapus" onclick="hapusPesan(${index})">Hapus</button>
           </div>
-        `;
-      });
+        </div>
+      `;
+    });
+  }
+
+  function simpanPesan() {
+    const input = document.getElementById("inputPesan");
+    const teks = input.value.trim();
+    if (teks === "") return alert("Pesan kosong!");
+
+    const data = ambilData();
+
+    if (editIndex !== null) {
+      data[editIndex] = teks;
+      editIndex = null;
+    } else {
+      data.push(teks);
     }
 
-    function tambahPesan() {
-      const textarea = document.getElementById("pesan");
-      const teks = textarea.value.trim();
-      if (teks === "") return alert("Pesan tidak boleh kosong!");
-
-      const data = ambilPesan();
-
-      if (editIndex !== null) {
-        data[editIndex] = teks;
-        editIndex = null;
-      } else {
-        data.push(teks);
-      }
-
-      simpanPesan(data);
-      textarea.value = "";
-      tampilPesan();
-    }
-
-    function editPesan(index) {
-      const data = ambilPesan();
-      document.getElementById("pesan").value = data[index];
-      editIndex = index;
-    }
-
-    function hapusPesan(index) {
-      const data = ambilPesan();
-      data.splice(index, 1);
-      simpanPesan(data);
-      tampilPesan();
-    }
-
+    simpanData(data);
+    input.value = "";
     tampilPesan();
-  </script>
+  }
+
+  function editPesan(index) {
+    const data = ambilData();
+    document.getElementById("inputPesan").value = data[index];
+    editIndex = index;
+  }
+
+  function hapusPesan(index) {
+    const data = ambilData();
+    data.splice(index, 1);
+    simpanData(data);
+    tampilPesan();
+  }
+
+  tampilPesan();
+</script>
 
 </body>
 </html>
